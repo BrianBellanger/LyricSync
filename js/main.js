@@ -1,3 +1,5 @@
+import config from "../config/config.js";
+
 const searchForm = document.getElementById("searchForm");
 searchForm.addEventListener("submit", function (event) {
   event.preventDefault();
@@ -5,59 +7,44 @@ searchForm.addEventListener("submit", function (event) {
   const title = document.getElementById("title").value.trim();
   const artist = document.getElementById("artist").value.trim();
 
-  document.getElementById("lyrics").textContent = "";
-  document.getElementById("songs").textContent = "";
+  document.getElementById("lyrics").innerHTML = "";
+  document.getElementById("songs").innerHTML = "";
 
   getLyrics(artist, title);
-  getVideos(artist, title, 5);
+  getSongs(artist, title, 5);
 });
 
-function getLyrics(artist, title) {
-  var apiUrl =
-    "https://api.lyrics.ovh/v1/" +
-    encodeURIComponent(artist) +
-    "/" +
-    encodeURIComponent(title);
-
-  fetch(apiUrl)
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then(function (data) {
-      if (data.lyrics) {
-        $("#lyrics").innerText = data.lyrics;
-      } else {
-        $("#lyrics").textContent = "Lyrics not found.";
-      }
-    })
-    .catch(function (error) {
-      $("#lyrics").textContent = "Unable to fetch lyrics.";
-      console.error(error);
-    });
+async function getLyrics(artist, title) {
+  try {
+    const response = await fetch("https://api.lyrics.ovh/v1/" + encodeURIComponent(artist) + "/" + encodeURIComponent(title), {method: "GET", headers: {"Content-Type": "application/json"}});
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    const data = await response.json();
+    if (data.lyrics) {
+      document.getElementById("lyrics").innerText = data.lyrics;
+    } else {
+      document.getElementById("lyrics").textContent = "Lyrics not found.";
+    }
+  } catch (error) {
+    console.error("Error fetching lyrics:", error);
+    document.getElementById("lyrics").textContent = "Error fetching lyrics.";
+  }
 }
 
-function getVideos(artist, title, maxResults) {
-  $("#videos").empty();
-  $.get(
-    "https://www.googleapis.com/youtube/v3/search?key=AIzaSyClOnNDd4howxJo-Q-1PXhG2Y__Jo44jP4" +
-      "&type=video&part=snippet&maxResults=" +
-      maxResults +
-      "&q=" +
-      artist +
-      " - " +
-      title,
-    function (data) {
-      console.log(data);
-      data.items.forEach((item) => {
-        songs = `
-                <iframe class="has-ratio" width="360" height="360" src="https://www.youtube.com/embed/${item.id.videoId}" frameborder="0" 
-                allowfullscreen></iframe>
-                `;
-        $("#songs").append(songs);
-      });
-    },
-  );
+async function getSongs(artist, title, maxResults) {
+  try {
+    const key = config.GOOGLE_API_KEY;
+    const query = encodeURIComponent(artist + " - " + title);
+    const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?key=${key}&type=video&part=snippet&maxResults=${maxResults}&q=${query}`;
+    const response = await fetch(youtubeApiUrl);
+    const data = await response.json();
+    data.items.forEach((item) => {
+      songs = `<iframe src="https://www.youtube.com/embed/${item.id.videoId}" frameborder="0" allowfullscreen></iframe>`;
+      document.getElementById("songs").innerHTML += songs;
+    });
+  } catch (error) {
+    console.error("Error fetching songs:", error);
+    document.getElementById("songs").textContent = "Error fetching songs.";
+  }
 }
