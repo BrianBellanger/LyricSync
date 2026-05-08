@@ -21,10 +21,7 @@ async function handleSearch(event) {
     return;
   }
 
-  await Promise.all([
-    getLyrics(artist, title),
-    getSongs(artist, title, 5),
-  ]);
+  await Promise.all([getLyrics(artist, title), getSongs(artist, title, 5)]);
 }
 
 function clearResults() {
@@ -34,10 +31,8 @@ function clearResults() {
 
 async function getLyrics(artist, title) {
   try {
-    const lyricsUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(
-      artist
-    )}/${encodeURIComponent(title)}`;
-
+    const lyricsUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
+    console.log(`Fetching lyrics from: ${lyricsUrl}`);
     const response = await fetch(lyricsUrl);
 
     if (!response.ok) {
@@ -48,11 +43,9 @@ async function getLyrics(artist, title) {
 
     const lyricsElement = document.createElement("pre");
 
-    lyricsElement.textContent =
-      data.lyrics || "Lyrics not found.";
+    lyricsElement.textContent = data.lyrics || "Lyrics not found.";
 
     lyricsContainer.appendChild(lyricsElement);
-
   } catch (error) {
     console.error("Error fetching lyrics:", error);
 
@@ -64,16 +57,10 @@ async function getLyrics(artist, title) {
 
 async function getSongs(artist, title, maxResults = 5) {
   try {
-    const query = encodeURIComponent(`${artist} - ${title}`);
+    const query = encodeURIComponent(`${artist}-${title}`);
 
-    const youtubeApiUrl =
-      `https://www.googleapis.com/youtube/v3/search` +
-      `?key=${config.GOOGLE_API_KEY}` +
-      `&type=video` +
-      `&part=snippet` +
-      `&maxResults=${maxResults}` +
-      `&q=${query}`;
-
+    const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?key=${config.GOOGLE_API_KEY}&type=video&part=snippet&maxResults=${maxResults}&q=${query}`;
+    console.log(`Fetching songs from: ${youtubeApiUrl}`);
     const response = await fetch(youtubeApiUrl);
 
     if (!response.ok) {
@@ -99,7 +86,6 @@ async function getSongs(artist, title, maxResults = 5) {
 
       songsContainer.appendChild(iframe);
     });
-
   } catch (error) {
     console.error("Error fetching songs:", error);
 
