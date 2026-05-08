@@ -3,24 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>LyricSync</title>
+
+    <script type="module" src="./js/main.js" defer></script>
   </head>
-  <header>
-    <h1>LyricSync</h1>
-    <form id="searchForm" action="./js/main.js">
-      <label for="title">Title:</label>
-      <input type="text" id="title" name="title" placeholder="Title" required />
-      <label for="artist">Artist:</label>
-      <input type="text" id="artist" name="artist" placeholder="Artist" required />
-      <input type="submit" value="Search" />
-    </form>
-  </header>
+
   <body>
-    <div id="lyrics">Lyrics</div>
-    <div id="songs">Songs</div>
-    <script src="./js/main.js"></script>
+    <header>
+      <h1>LyricSync</h1>
+
+      <form id="searchForm">
+        <label for="title">Title:</label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          placeholder="Title"
+          required
+        />
+
+        <label for="artist">Artist:</label>
+        <input
+          type="text"
+          id="artist"
+          name="artist"
+          placeholder="Artist"
+          required
+        />
+
+        <button type="submit">Search</button>
+      </form>
+    </header>
+
+    <main>
+      <section id="lyrics">
+        <h2>Lyrics</h2>
+      </section>
+
+      <section id="songs">
+        <h2>Songs</h2>
+      </section>
+    </main>
   </body>
-  <footer>
-    <p>2026 LyricSync</p>
-  </footer>
 </html>

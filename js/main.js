@@ -1,50 +1,110 @@
 import config from "../config/config.js";
 
 const searchForm = document.getElementById("searchForm");
-searchForm.addEventListener("submit", function (event) {
+const titleInput = document.getElementById("title");
+const artistInput = document.getElementById("artist");
+
+const lyricsContainer = document.getElementById("lyrics");
+const songsContainer = document.getElementById("songs");
+
+searchForm.addEventListener("submit", handleSearch);
+
+async function handleSearch(event) {
   event.preventDefault();
 
-  const title = document.getElementById("title").value.trim();
-  const artist = document.getElementById("artist").value.trim();
+  const title = titleInput.value.trim();
+  const artist = artistInput.value.trim();
 
-  document.getElementById("lyrics").innerHTML = "";
-  document.getElementById("songs").innerHTML = "";
+  clearResults();
 
-  getLyrics(artist, title);
-  getSongs(artist, title, 5);
-});
+  if (!title || !artist) {
+    return;
+  }
+
+  await Promise.all([
+    getLyrics(artist, title),
+    getSongs(artist, title, 5),
+  ]);
+}
+
+function clearResults() {
+  lyricsContainer.innerHTML = "<h2>Lyrics</h2>";
+  songsContainer.innerHTML = "<h2>Videos</h2>";
+}
 
 async function getLyrics(artist, title) {
   try {
-    const response = await fetch("https://api.lyrics.ovh/v1/" + encodeURIComponent(artist) + "/" + encodeURIComponent(title), {method: "GET", headers: {"Content-Type": "application/json"}});
+    const lyricsUrl = `https://api.lyrics.ovh/v1/${encodeURIComponent(
+      artist
+    )}/${encodeURIComponent(title)}`;
+
+    const response = await fetch(lyricsUrl);
+
     if (!response.ok) {
-      throw new Error(response.statusText);
+      throw new Error(`Lyrics API Error: ${response.status}`);
     }
+
     const data = await response.json();
-    if (data.lyrics) {
-      document.getElementById("lyrics").innerText = data.lyrics;
-    } else {
-      document.getElementById("lyrics").textContent = "Lyrics not found.";
-    }
+
+    const lyricsElement = document.createElement("pre");
+
+    lyricsElement.textContent =
+      data.lyrics || "Lyrics not found.";
+
+    lyricsContainer.appendChild(lyricsElement);
+
   } catch (error) {
     console.error("Error fetching lyrics:", error);
-    document.getElementById("lyrics").textContent = "Error fetching lyrics.";
+
+    lyricsContainer.innerHTML += `
+      <p>Error fetching lyrics.</p>
+    `;
   }
 }
 
-async function getSongs(artist, title, maxResults) {
+async function getSongs(artist, title, maxResults = 5) {
   try {
-    const key = config.GOOGLE_API_KEY;
-    const query = encodeURIComponent(artist + " - " + title);
-    const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?key=${key}&type=video&part=snippet&maxResults=${maxResults}&q=${query}`;
+    const query = encodeURIComponent(`${artist} - ${title}`);
+
+    const youtubeApiUrl =
+      `https://www.googleapis.com/youtube/v3/search` +
+      `?key=${config.GOOGLE_API_KEY}` +
+      `&type=video` +
+      `&part=snippet` +
+      `&maxResults=${maxResults}` +
+      `&q=${query}`;
+
     const response = await fetch(youtubeApiUrl);
+
+    if (!response.ok) {
+      throw new Error(`YouTube API Error: ${response.status}`);
+    }
+
     const data = await response.json();
+
+    if (!data.items || data.items.length === 0) {
+      songsContainer.innerHTML += `
+        <p>No videos found.</p>
+      `;
+      return;
+    }
+
     data.items.forEach((item) => {
-      songs = `<iframe src="https://www.youtube.com/embed/${item.id.videoId}" frameborder="0" allowfullscreen></iframe>`;
-      document.getElementById("songs").innerHTML += songs;
+      const iframe = document.createElement("iframe");
+
+      iframe.src = `https://www.youtube.com/embed/${item.id.videoId}`;
+      iframe.width = "300";
+      iframe.height = "170";
+      iframe.allowFullscreen = true;
+
+      songsContainer.appendChild(iframe);
     });
+
   } catch (error) {
     console.error("Error fetching songs:", error);
-    document.getElementById("songs").textContent = "Error fetching songs.";
+
+    songsContainer.innerHTML += `
+      <p>Error fetching songs.</p>
+    `;
   }
 }
