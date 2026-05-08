@@ -35,6 +35,13 @@ async function getLyrics(artist, title) {
     console.log(`Fetching lyrics from: ${lyricsUrl}`);
     const response = await fetch(lyricsUrl);
 
+    if (response.status === 404) {
+      lyricsContainer.innerHTML += `
+        <p>Lyrics not found for this song.</p>
+      `;
+      return;
+    }
+
     if (!response.ok) {
       throw new Error(`Lyrics API Error: ${response.status}`);
     }
@@ -57,7 +64,7 @@ async function getLyrics(artist, title) {
 
 async function getSongs(artist, title, maxResults = 5) {
   try {
-    const query = encodeURIComponent(`${artist}-${title}`);
+    const query = encodeURIComponent(`${artist} ${title} official music video`);
 
     const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?key=${config.GOOGLE_API_KEY}&type=video&part=snippet&maxResults=${maxResults}&q=${query}`;
     console.log(`Fetching songs from: ${youtubeApiUrl}`);
@@ -77,12 +84,17 @@ async function getSongs(artist, title, maxResults = 5) {
     }
 
     data.items.forEach((item) => {
+      if (!item.id.videoId) return;
+
       const iframe = document.createElement("iframe");
 
       iframe.src = `https://www.youtube.com/embed/${item.id.videoId}`;
+      iframe.title = item.snippet.title;
       iframe.width = "300";
       iframe.height = "170";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
       iframe.allowFullscreen = true;
+      iframe.loading = "lazy";
 
       songsContainer.appendChild(iframe);
     });
