@@ -1,23 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LyricSync</title>
-</head>
-<header>
+  </head>
+  <header>
     <h1>LyricSync</h1>
-    <input type="text" placeholder="Title">
-    <input type="text" placeholder="Artist">
-    <button>Search</button>
-</header>
-<body>
-    <div>Lyrics</div>
-    <div>Songs</div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="./assets/js/script.js"></script>
-</body>
-<footer>
+    <form id="searchForm" action="./js/main.js">
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" placeholder="Title" required />
+      <label for="artist">Artist:</label>
+      <input type="text" id="artist" name="artist" placeholder="Artist" required />
+      <input type="submit" value="Search" />
+    </form>
+  </header>
+  <body>
+    <div id="lyrics">Lyrics</div>
+    <div id="songs">Songs</div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="./assets/js/script.js"></script>
+  </body>
+  <footer>
     <p>2026 LyricSync</p>
-</footer>
+  </footer>
 </html>
