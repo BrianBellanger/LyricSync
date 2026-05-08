@@ -1,6 +1,5 @@
 # Config file
 config.js
-CLAUDE.md
 
 # Logs
 logs
@@ -145,3 +144,9 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+CLAUDE.md
+PROMPTS.md
+AI_NOTES.md
+scratch.txt
+temp.md
