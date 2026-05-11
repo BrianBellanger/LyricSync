@@ -6,6 +6,11 @@
 
     <title>LyricSync</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/main.css" />
+
     <script type="module" src="./js/main.js" defer></script>
   </head>
 
@@ -37,21 +42,15 @@
     </header>
 
     <main>
-      <table width="100%">
-        <tr>
-        </tr>
-        <td width="50%">
-          <section id="lyrics">
-            <h2>Lyrics</h2>
-          </section>
-        </td>
-        <td width="50%">
-          <section id="songs">
-            <h2>Songs</h2>
-          </section>
-        </td>
-      </tr>
-      </table>
+      <div class="content-grid">
+        <section id="lyrics">
+          <h2>Lyrics</h2>
+        </section>
+
+        <section id="songs">
+          <h2>Videos</h2>
+        </section>
+      </div>
     </main>
   </body>
 </html>
